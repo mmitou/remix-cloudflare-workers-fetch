@@ -7,6 +7,6 @@ esbuild
     sourcemap: false,
     format: "esm",
     outfile: "dist/index.mjs",
-		external: ["./node_modules"],
+    external: ["./node_modules"],
   })
   .catch(() => process.exit(1));
