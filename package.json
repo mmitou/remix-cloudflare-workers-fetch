@@ -3,7 +3,9 @@
   "type": "module",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "version": "1.0.0",
   "description": "remix adapter for cloudflare workers",
   "scripts": {
@@ -12,7 +14,10 @@
     "build": "tsc",
     "test": "jest"
   },
-  "keywords": ["cloudflare", "remix"],
+  "keywords": [
+    "cloudflare",
+    "remix"
+  ],
   "author": "Masayuki Ito",
   "license": "MIT",
   "dependencies": {
