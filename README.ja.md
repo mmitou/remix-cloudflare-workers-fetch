@@ -79,6 +79,12 @@ import type { ServerBuild } from "@remix-run/server-runtime";
 const fetch = createFetch({
   build: build as unknown as ServerBuild,
   assetJson,
+  mode: "production",
+  options: {
+    cacheControl: {
+      bypassCache: true,
+    }
+  }
 });
 
 export default {
