@@ -9,6 +9,8 @@ const createAssetHandler = (build, assetManifest, mode, options) => {
             };
             if (mode === "development") {
                 return await getAssetFromKV(event, {
+                    ASSET_NAMESPACE: env.__STATIC_CONTENT,
+                    ASSET_MANIFEST: assetManifest,
                     cacheControl: {
                         bypassCache: true,
                     },
@@ -32,13 +34,12 @@ const createAssetHandler = (build, assetManifest, mode, options) => {
                     edgeTTL: 31536000,
                 };
             }
-            const opts = {
+            return await getAssetFromKV(event, {
                 ASSET_NAMESPACE: env.__STATIC_CONTENT,
                 ASSET_MANIFEST: assetManifest,
                 cacheControl,
                 ...options,
-            };
-            return await getAssetFromKV(event, opts);
+            });
         }
         catch (error) {
             if (error instanceof MethodNotAllowedError ||

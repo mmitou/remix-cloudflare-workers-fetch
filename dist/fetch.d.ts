@@ -1,7 +1,10 @@
 /// <reference types="@cloudflare/workers-types" />
 import type { ServerBuild } from "@remix-run/server-runtime";
 import type { Options as KvAssetHandlerOptions } from "@cloudflare/kv-asset-handler";
-interface Context {
+export interface Env {
+    __STATIC_CONTENT: any;
+}
+export interface Context {
     waitUntil: (a: Promise<any>) => void;
 }
 export declare type Mode = "development" | "production" | "test";

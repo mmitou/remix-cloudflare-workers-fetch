@@ -7,11 +7,11 @@ import {
   NotFoundError,
 } from "@cloudflare/kv-asset-handler";
 
-interface Env {
+export interface Env {
   __STATIC_CONTENT: any;
 }
 
-interface Context {
+export interface Context {
   waitUntil: (a: Promise<any>) => void;
 }
 
@@ -32,6 +32,8 @@ const createAssetHandler = (
 
       if (mode === "development") {
         return await getAssetFromKV(event, {
+          ASSET_NAMESPACE: env.__STATIC_CONTENT,
+          ASSET_MANIFEST: assetManifest,
           cacheControl: {
             bypassCache: true,
           },
@@ -57,14 +59,12 @@ const createAssetHandler = (
         };
       }
 
-      const opts = {
+      return await getAssetFromKV(event, {
         ASSET_NAMESPACE: env.__STATIC_CONTENT,
         ASSET_MANIFEST: assetManifest,
         cacheControl,
         ...options,
-      };
-
-      return await getAssetFromKV(event, opts);
+      });
     } catch (error) {
       if (
         error instanceof MethodNotAllowedError ||
