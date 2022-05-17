@@ -3,7 +3,7 @@
 
 # remix-cloudflare-workers-fetch
 
-> cloudflare workersのfetch関数からremixを呼び出すためのプロジェクト
+> remix server adapter for cloudflare workers worker module.
 
 ## Install
 
