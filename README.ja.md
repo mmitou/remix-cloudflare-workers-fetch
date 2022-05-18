@@ -5,6 +5,34 @@
 
 > remix server adapter for cloudflare workers worker module.
 
+cloudflare workersのworker moduleからremixを使えるようにしました。  
+workerを以下のように実装して、createFetch関数を呼び出して下さい。  
+
+worker/index.ts  
+```ts
+import { createFetch } from "remix-cloudflare-workers-fetch";
+import * as build from "../build";
+//@ts-ignore
+import assetJson from "__STATIC_CONTENT_MANIFEST";
+import type { ServerBuild } from "@remix-run/server-runtime";
+
+const fetch = createFetch({
+  build: build as unknown as ServerBuild,
+  assetJson,
+  mode: "production",
+  options: {
+    cacheControl: {
+      bypassCache: true,
+    }
+  }
+});
+
+export default {
+  fetch,
+};
+```
+
+
 ## Install
 
 ```sh
