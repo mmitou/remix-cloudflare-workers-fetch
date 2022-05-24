@@ -1,5 +1,14 @@
-import { createRequestHandler } from "@remix-run/server-runtime";
+import { createRequestHandler as createRemixRequestHandler } from "@remix-run/server-runtime";
 import { getAssetFromKV, MethodNotAllowedError, NotFoundError, } from "@cloudflare/kv-asset-handler";
+const createRequestHandler = ({ build, getLoadContext, mode }) => {
+    const handleRequest = createRemixRequestHandler(build, mode);
+    return (request, env, ctx) => {
+        const loadContext = typeof getLoadContext === "function"
+            ? getLoadContext(request, env, ctx)
+            : undefined;
+        return handleRequest(request, loadContext);
+    };
+};
 const createAssetHandler = (build, assetManifest, mode, options) => {
     return async (request, env, { waitUntil }) => {
         try {
@@ -53,15 +62,15 @@ const createAssetHandler = (build, assetManifest, mode, options) => {
 /**
  * Returns a fetch function for cloudflare worker module.
  */
-export const createFetch = ({ build, assetJson, mode, options, }) => {
+export const createFetch = ({ build, assetJson, mode, options, getLoadContext, }) => {
     const assetManifest = JSON.parse(assetJson);
     const handleAsset = createAssetHandler(build, assetManifest, mode, options);
-    const handleRequest = createRequestHandler(build, mode);
+    const handleRequest = createRequestHandler({ build, getLoadContext, mode });
     return async (request, env, ctx) => {
         try {
             let response = await handleAsset(request, env, ctx);
             if (!response) {
-                response = await handleRequest(request, env);
+                response = await handleRequest(request, env, ctx);
             }
             return response;
         }

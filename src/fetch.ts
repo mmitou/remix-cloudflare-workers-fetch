@@ -1,5 +1,5 @@
-import { createRequestHandler } from "@remix-run/server-runtime";
-import type { ServerBuild } from "@remix-run/server-runtime";
+import { createRequestHandler as createRemixRequestHandler } from "@remix-run/server-runtime";
+import type { AppLoadContext, ServerBuild } from "@remix-run/server-runtime";
 import type { Options as KvAssetHandlerOptions } from "@cloudflare/kv-asset-handler";
 import {
   getAssetFromKV,
@@ -7,15 +7,36 @@ import {
   NotFoundError,
 } from "@cloudflare/kv-asset-handler";
 
-export interface Env {
+interface StaticContentEnv {
   __STATIC_CONTENT: any;
 }
 
-export interface Context {
-  waitUntil: (a: Promise<any>) => void;
+export interface GetLoadContextFunction<Env = unknown> {
+  (request: Request, env: Env, ctx: ExecutionContext): AppLoadContext;
 }
 
 export type Mode = "development" | "production" | "test";
+
+const createRequestHandler = <Env>({
+  build,
+  getLoadContext,
+  mode,
+}: {
+  build: ServerBuild;
+  getLoadContext?: GetLoadContextFunction<Env>;
+  mode?: Mode;
+}): ExportedHandlerFetchHandler<Env> => {
+  const handleRequest = createRemixRequestHandler(build, mode);
+
+  return (request: Request, env: Env, ctx: ExecutionContext) => {
+    const loadContext =
+      typeof getLoadContext === "function"
+        ? getLoadContext(request, env, ctx)
+        : undefined;
+
+    return handleRequest(request, loadContext);
+  };
+};
 
 const createAssetHandler = (
   build: ServerBuild,
@@ -23,7 +44,11 @@ const createAssetHandler = (
   mode?: Mode,
   options?: Partial<KvAssetHandlerOptions>
 ) => {
-  return async (request: Request, env: Env, { waitUntil }: Context) => {
+  return async <Env extends StaticContentEnv>(
+    request: Request,
+    env: Env,
+    { waitUntil }: ExecutionContext
+  ) => {
     try {
       const event = {
         request,
@@ -78,13 +103,6 @@ const createAssetHandler = (
   };
 };
 
-interface createFetchArgs {
-  build: ServerBuild;
-  assetJson: string;
-  mode?: Mode;
-  options?: Partial<KvAssetHandlerOptions>;
-}
-
 /**
  * Returns a fetch function for cloudflare worker module.
  */
@@ -93,16 +111,27 @@ export const createFetch = ({
   assetJson,
   mode,
   options,
-}: createFetchArgs) => {
+  getLoadContext,
+}: {
+  build: ServerBuild;
+  assetJson: string;
+  mode?: Mode;
+  options?: Partial<KvAssetHandlerOptions>;
+  getLoadContext?: GetLoadContextFunction;
+}) => {
   const assetManifest = JSON.parse(assetJson);
   const handleAsset = createAssetHandler(build, assetManifest, mode, options);
-  const handleRequest = createRequestHandler(build, mode);
+  const handleRequest = createRequestHandler({ build, getLoadContext, mode });
 
-  return async (request: Request, env: any, ctx: Context) => {
+  return async <Env extends StaticContentEnv>(
+    request: Request,
+    env: Env,
+    ctx: ExecutionContext
+  ) => {
     try {
       let response = await handleAsset(request, env, ctx);
       if (!response) {
-        response = await handleRequest(request, env);
+        response = await handleRequest(request, env, ctx);
       }
       return response;
     } catch (e: any) {

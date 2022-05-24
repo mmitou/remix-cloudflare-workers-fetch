@@ -1,2 +1,2 @@
-import { createFetch, Env, Context } from "./fetch";
-export { createFetch, Env, Context };
+import { createFetch } from "./fetch";
+export { createFetch };

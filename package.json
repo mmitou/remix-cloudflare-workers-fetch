@@ -3,7 +3,9 @@
   "type": "module",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "version": "1.0.4",
   "description": "remix adapter for cloudflare workers",
   "repository": {
@@ -21,12 +23,15 @@
     "lint:eslint": "eslint . --ext .ts --fix",
     "lint:prettier": "prettier --write ."
   },
-  "keywords": ["cloudflare", "remix"],
+  "keywords": [
+    "cloudflare",
+    "remix"
+  ],
   "author": "Masayuki Ito",
   "license": "MIT",
   "dependencies": {
     "@cloudflare/kv-asset-handler": "^0.2.0",
-    "@remix-run/server-runtime": "^1.4.3"
+    "@remix-run/server-runtime": "^1.5.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3.10.0",
@@ -52,6 +57,9 @@
     "typescript": "^4.6.4"
   },
   "lint-staged": {
-    "{src,test}/**/*.ts": ["eslint --cache --fix", "prettier --write"]
+    "{src,test}/**/*.ts": [
+      "eslint --cache --fix",
+      "prettier --write"
+    ]
   }
 }
