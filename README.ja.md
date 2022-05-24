@@ -11,10 +11,11 @@ workerを以下のように実装して、createFetch関数を呼び出して下
 worker/index.ts  
 ```ts
 import { createFetch } from "remix-cloudflare-workers-fetch";
+import type { ServerBuild } from "remix-cloudflare-workers-fetch";
 import * as build from "../build";
 //@ts-ignore
 import assetJson from "__STATIC_CONTENT_MANIFEST";
-import type { ServerBuild } from "@remix-run/server-runtime";
+
 
 const fetch = createFetch({
   build: build as unknown as ServerBuild,
@@ -99,10 +100,10 @@ workerディレクトリを作成してmodule workerを実装します。
 worker/index.ts
 ```ts
 import { createFetch } from "remix-cloudflare-workers-fetch";
+import type { ServerBuild } from "remix-cloudflare-workers-fetch";
 import * as build from "../build";
 //@ts-ignore
 import assetJson from "__STATIC_CONTENT_MANIFEST";
-import type { ServerBuild } from "@remix-run/server-runtime";
 
 const fetch = createFetch({
   build: build as unknown as ServerBuild,

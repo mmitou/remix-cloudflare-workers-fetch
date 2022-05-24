@@ -1,11 +1,15 @@
 import { createRequestHandler as createRemixRequestHandler } from "@remix-run/server-runtime";
 import { getAssetFromKV, MethodNotAllowedError, NotFoundError, } from "@cloudflare/kv-asset-handler";
-const createRequestHandler = ({ build, getLoadContext, mode }) => {
+const createRequestHandler = ({ build, getLoadContext, mode, }) => {
     const handleRequest = createRemixRequestHandler(build, mode);
+    let loader = (_, env, ctx) => {
+        return { ...env, ...ctx };
+    };
+    if (getLoadContext) {
+        loader = getLoadContext;
+    }
     return (request, env, ctx) => {
-        const loadContext = typeof getLoadContext === "function"
-            ? getLoadContext(request, env, ctx)
-            : undefined;
+        const loadContext = loader(request, env, ctx);
         return handleRequest(request, loadContext);
     };
 };

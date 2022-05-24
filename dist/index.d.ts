@@ -1,2 +1,3 @@
 import { createFetch } from "./fetch";
-export { createFetch };
+import type { ServerBuild } from "@remix-run/server-runtime";
+export { createFetch, ServerBuild };

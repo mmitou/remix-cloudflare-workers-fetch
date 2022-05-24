@@ -17,7 +17,7 @@ export interface GetLoadContextFunction<Env = unknown> {
 
 export type Mode = "development" | "production" | "test";
 
-const createRequestHandler = <Env>({
+const createRequestHandler = <Env extends object>({
   build,
   getLoadContext,
   mode,
@@ -28,11 +28,16 @@ const createRequestHandler = <Env>({
 }): ExportedHandlerFetchHandler<Env> => {
   const handleRequest = createRemixRequestHandler(build, mode);
 
+  let loader = (_: Request, env: Env, ctx: ExecutionContext) => {
+    return { ...env, ...ctx };
+  };
+
+  if (getLoadContext) {
+    loader = getLoadContext;
+  }
+
   return (request: Request, env: Env, ctx: ExecutionContext) => {
-    const loadContext =
-      typeof getLoadContext === "function"
-        ? getLoadContext(request, env, ctx)
-        : undefined;
+    const loadContext = loader(request, env, ctx);
 
     return handleRequest(request, loadContext);
   };

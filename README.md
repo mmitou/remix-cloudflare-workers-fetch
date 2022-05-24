@@ -11,10 +11,10 @@ Implement the worker as follows and call the createFetch function.
 worker/index.ts
 ```ts
 import { createFetch } from "remix-cloudflare-workers-fetch";
+import type { ServerBuild } from "remix-cloudflare-workers-fetch";
 import * as build from "../build";
 //@ts-ignore
 import assetJson from "__STATIC_CONTENT_MANIFEST";
-import type { ServerBuild } from "@remix-run/server-runtime";
 
 const fetch = createFetch({
   build: build as unknown as ServerBuild,
@@ -102,10 +102,10 @@ touch worker/index.ts
 worker/index.ts
 ```ts
 import { createFetch } from "remix-cloudflare-workers-fetch";
+import type { ServerBuild } from "remix-cloudflare-workers-fetch";
 import * as build from "../build";
 //@ts-ignore
 import assetJson from "__STATIC_CONTENT_MANIFEST";
-import type { ServerBuild } from "@remix-run/server-runtime";
 
 const fetch = createFetch({
   build: build as unknown as ServerBuild,
