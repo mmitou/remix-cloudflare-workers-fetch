@@ -1,5 +1,5 @@
 import { createRequestHandler as createRemixRequestHandler } from "@remix-run/server-runtime";
-import type { AppLoadContext, ServerBuild } from "@remix-run/server-runtime";
+import type { ServerBuild } from "@remix-run/server-runtime";
 import type { Options as KvAssetHandlerOptions } from "@cloudflare/kv-asset-handler";
 import {
   getAssetFromKV,
@@ -12,7 +12,7 @@ interface StaticContentEnv {
 }
 
 export interface GetLoadContextFunction<Env = unknown> {
-  (request: Request, env: Env, ctx: ExecutionContext): AppLoadContext;
+  (request: Request, env: Env, ctx: ExecutionContext): Record<string, any>;
 }
 
 export type Mode = "development" | "production" | "test";
@@ -28,18 +28,13 @@ const createRequestHandler = <Env extends object>({
 }): ExportedHandlerFetchHandler<Env> => {
   const handleRequest = createRemixRequestHandler(build, mode);
 
-  let loader = (_: Request, env: Env, ctx: ExecutionContext) => {
-    return { ...env, ...ctx };
-  };
-
-  if (getLoadContext) {
-    loader = getLoadContext;
-  }
-
   return (request: Request, env: Env, ctx: ExecutionContext) => {
-    const loadContext = loader(request, env, ctx);
+    if (getLoadContext) {
+      const appLoadContext = getLoadContext(request, env, ctx);
+      return handleRequest(request, { ...appLoadContext, ...env, ...ctx });
+    }
 
-    return handleRequest(request, loadContext);
+    return handleRequest(request, { ...env, ...ctx });
   };
 };
 

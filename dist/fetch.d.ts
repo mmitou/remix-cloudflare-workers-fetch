@@ -1,11 +1,11 @@
 /// <reference types="@cloudflare/workers-types" />
-import type { AppLoadContext, ServerBuild } from "@remix-run/server-runtime";
+import type { ServerBuild } from "@remix-run/server-runtime";
 import type { Options as KvAssetHandlerOptions } from "@cloudflare/kv-asset-handler";
 interface StaticContentEnv {
     __STATIC_CONTENT: any;
 }
 export interface GetLoadContextFunction<Env = unknown> {
-    (request: Request, env: Env, ctx: ExecutionContext): AppLoadContext;
+    (request: Request, env: Env, ctx: ExecutionContext): Record<string, any>;
 }
 export declare type Mode = "development" | "production" | "test";
 /**
